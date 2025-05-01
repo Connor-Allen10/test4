@@ -61,26 +61,17 @@ int stack_from_queues_isempty(struct stack_from_queues* stack) {
  *   value - the new value to be pushed onto the stack
  */
 void stack_from_queues_push(struct stack_from_queues* stack, int value) {
-	//if q1 is empty, push into q2
-	if(queue_isempty(stack->q1)){
-		queue_enqueue(stack->q2, value);
+	queue_enqueue(stack->q2, value); //new element goes into q2
 
-		// move all elements from q1 to q2 (keep order of stack)
-		while(!(queue_isempty(stack->q1))){
-			int temp = queue_dequeue(stack->q1);
-			queue_enqueue(stack->q2, temp);
-		}
+	//then move all from q1 to q2 so the new element is at the top
+	while(!queue_isempty(stack->q1)){
+		queue_enqueue(stack->q2, queue_dequeue(stack->q1));
 	}
 
-	//otherwise, push into q1
-	else {
-		queue_enqueue(stack->q1, value);
-		while(!(queue_isempty(stack->q2))){
-			int temp =  queue_dequeue(stack->q2);
-			queue_enqueue(stack->q1, temp);
-		}
-
-	}
+	//swap q1 and q2 so q1 is always the container for new elements
+	struct queue* temp = stack->q1;
+	stack->q1 = stack->q2;
+	stack->q2 = temp;
 }
 
 /*
@@ -96,16 +87,7 @@ void stack_from_queues_push(struct stack_from_queues* stack, int value) {
  *   Should return the value stored at the top of the stack.
  */
 int stack_from_queues_top(struct stack_from_queues* stack) {
-	//return front of non-empty queue
-	if(!(queue_isempty(stack->q1))){
-		return queue_front(stack->q1);
-	}
-	else if(!(queue_isempty(stack->q2))){
-		return queue_front(stack->q2);
-	}
-	else {
-		return 0;
-	}
+	return queue_front(stack->q1); //return the top of the stack
 }
 
 /*
@@ -121,14 +103,5 @@ int stack_from_queues_top(struct stack_from_queues* stack) {
  *   is popped.
  */
 int stack_from_queues_pop(struct stack_from_queues* stack) {
-	//pop from the non-empty queue
-	if(!(queue_isempty(stack->q1))){
-		return queue_dequeue(stack->q1);
-	}
-	else if(!(queue_isempty(stack->q2))){
-		return queue_dequeue(stack->q2);
-	}
-	else {
-		return 0;
-	}
+	return queue_dequeue(stack->q1); //remove the top of the stack and return it
 }
