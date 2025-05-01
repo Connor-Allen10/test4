@@ -8,7 +8,7 @@
  */
 
 #include <stdio.h>
-
+#include <stdlib.h>
 #include "stack.h"
 #include "queue_from_stacks.h"
 
@@ -17,7 +17,10 @@
  * your queue and return a pointer to the queue structure.
  */
 struct queue_from_stacks* queue_from_stacks_create() {
-  return NULL;
+	struct queue_from_stacks* queue = malloc(sizeof(struct queue_from_stacks));
+	queue->s1 = stack_create();
+	queue->s2 = stack_create();
+	return queue;
 }
 
 /*
@@ -29,7 +32,9 @@ struct queue_from_stacks* queue_from_stacks_create() {
  *     exit the program with an error if queue is NULL.
  */
 void queue_from_stacks_free(struct queue_from_stacks* queue) {
-
+	stack_free(queue->s1);
+	stack_free(queue->s2);
+	free(queue);
 }
 
 /*
@@ -44,7 +49,10 @@ void queue_from_stacks_free(struct queue_from_stacks* queue) {
  *   Should return 1 if the queue is empty or 0 otherwise.
  */
 int queue_from_stacks_isempty(struct queue_from_stacks* queue) {
-  return 1;
+	if(stack_isempty(queue->s1) && stack_isempty(queue->s2)){
+		return 1;
+	}
+	return 0;
 }
 
 /*
@@ -56,7 +64,7 @@ int queue_from_stacks_isempty(struct queue_from_stacks* queue) {
  *   value - the new value to be enqueueed onto the queue
  */
 void queue_from_stacks_enqueue(struct queue_from_stacks* queue, int value) {
-
+	stack_push(queue->s1, value);
 }
 
 /*
@@ -72,7 +80,14 @@ void queue_from_stacks_enqueue(struct queue_from_stacks* queue, int value) {
  *   Should return the value stored at the front of the queue.
  */
 int queue_from_stacks_front(struct queue_from_stacks* queue) {
-  return 0;
+	if(stack_isempty(queue->s2)){
+		while(!(stack_isempty(queue->s1))){
+			int temp = stack_pop(queue->s1); 
+			stack_push(queue->s2, temp);
+		}
+	}
+	return stack_top(queue->s2);
+
 }
 
 /*
@@ -88,5 +103,12 @@ int queue_from_stacks_front(struct queue_from_stacks* queue) {
  *   is dequeued.
  */
 int queue_from_stacks_dequeue(struct queue_from_stacks* queue) {
-  return 0;
+	// if stack2 is empty, move all the elements in stack1 to stack2.
+	if(stack_isempty(queue->s2)){
+		while(!(stack_isempty(queue->s1))){
+			int temp = stack_pop(queue->s1); 
+			stack_push(queue->s2, temp);
+		}
+	}
+	return stack_pop(queue->s2);
 }

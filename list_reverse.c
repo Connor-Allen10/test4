@@ -24,5 +24,15 @@
  *   function should return NULL.
  */
 struct node* list_reverse(struct node* first) {
-  return NULL;
+	struct node* prev = NULL;
+	struct node* current = first;
+	struct node* next = NULL;
+
+	while(current != NULL){
+		next = current->next; //store next node
+		current->next = prev; //current node's next pointer now points to previous
+		prev = current; //move previous node to current node
+		current = next; //move to next node
+	}
+	return prev; //new head of list
 }
